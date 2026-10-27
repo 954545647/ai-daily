@@ -1,0 +1,52 @@
+.env.example
+  h_22fd74f511b019 1-24
+.github/workflows/daily.yml
+  h_22fd74f511b019 1-50
+.github/workflows/pages.yml
+  h_22fd74f511b019 1-31
+.gitignore
+  h_22fd74f511b019 1-9
+README.md
+  h_22fd74f511b019 1-149
+com.aidaily.plist
+  h_22fd74f511b019 1-33
+config.py
+  h_22fd74f511b019 1-90
+digests/2026-10-28.html
+  h_22fd74f511b019 1-187
+docs/2026-10-28.html
+  h_22fd74f511b019 1-187
+docs/index.html
+  h_22fd74f511b019 1-187
+doctor.py
+  h_22fd74f511b019 1-103
+env.py
+  h_22fd74f511b019 1-69
+fetch.py
+  h_22fd74f511b019 1-458
+notify.py
+  h_22fd74f511b019 1-241
+pack.sh
+  h_22fd74f511b019 1-17
+publish.sh
+  h_22fd74f511b019 1-27
+reader.py
+  h_22fd74f511b019 1-248
+render.py
+  h_22fd74f511b019 1-140
+run.sh
+  h_22fd74f511b019 1-21
+summarize.py
+  h_22fd74f511b019 1-352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "707a9cc1a4570edd64189a8f2337d34b5b6f8e82",
+  "prompts": {},
+  "humans": {
+    "h_22fd74f511b019": {
+      "author": "rex <954545647@qq.com>"
+    }
+  }
+}
