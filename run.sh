@@ -14,6 +14,7 @@ LOG="logs/run-$(date +%Y-%m-%d).log"
   python3 summarize.py
   python3 reader.py
   python3 notify.py
+  bash publish.sh || echo '⚠️ 发布失败（不影响已推送的日报）'
   echo "===== $(date '+%F %T') 完成 ====="
 } 2>&1 | tee -a "$LOG"
 

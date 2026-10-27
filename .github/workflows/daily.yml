@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   daily:
+    # 想让它每天在 GitHub 上跑：仓库 Settings → Variables 加 RUN_DAILY=true
+    if: vars.RUN_DAILY == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 

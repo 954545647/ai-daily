@@ -223,15 +223,21 @@ def main() -> None:
         return
 
     mode = args.mode or cfg.get("DIGEST_MODE", "single")
-    reader_url = cfg.get("READER_URL", "").strip()
+    base = cfg.get("READER_URL", "").strip()
+    if not base:
+        page = ""
+    elif base.endswith(".html"):
+        page = base
+    else:
+        page = f"{base.rstrip('/')}/{args.date}.html"
 
     if mode == "split":
-        n = send_split(d, cfg, reader_url)
+        n = send_split(d, cfg, page)
         print(f"✅ 已推送 {n} 张卡片（逐条模式）")
     else:
-        post_webhook(build_card(d, reader_url), cfg)
+        post_webhook(build_card(d, page), cfg)
         print(f"✅ 已推送单张卡片（{len(d.get('items', []))} 条）"
-              + ("，含逐条学习入口" if reader_url else ""))
+              + (f"，下一条按钮指向 {page}" if page else "，未配置网址") )
 
     sent[args.date] = datetime.now().strftime("%F %T")
     sf.write_text(json.dumps(sent, indent=2))
