@@ -1,0 +1,9 @@
+.env
+.env.local
+logs/
+__pycache__/
+data/*.json
+digests/*.json
+digests/*.md
+*.tar.gz
+preview.png

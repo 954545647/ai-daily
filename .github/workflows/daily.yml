@@ -1,0 +1,50 @@
+name: AI 日报
+
+# 每天 UTC 00:00 = 北京时间 08:00
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch: {}        # 也可以在 Actions 页面手动点一下立即跑
+
+permissions:
+  contents: write              # 用于把当天日报提交回仓库
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 抓取
+        working-directory: ai-daily
+        run: python3 fetch.py --verbose
+
+      - name: 精挑 + 写沉淀
+        working-directory: ai-daily
+        env:
+          LLM_PROVIDER: deepseek
+          LLM_BASE_URL: https://api.deepseek.com
+          LLM_MODEL: deepseek-chat
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python3 summarize.py
+
+      - name: 推送飞书
+        working-directory: ai-daily
+        env:
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+          FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
+        run: python3 notify.py
+
+      - name: 归档当天的日报（用于跨天去重）
+        run: |
+          git config user.name  "ai-daily-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -f ai-daily/digests/*.json ai-daily/data/*.json || true
+          git diff --staged --quiet || git commit -m "digest: $(date -u +%F)"
+          git push || echo "推送失败（可能没有写权限），不影响使用"
