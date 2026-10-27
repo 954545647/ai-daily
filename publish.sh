@@ -18,8 +18,8 @@ echo
 if git rev-parse --git-dir >/dev/null 2>&1 && git remote get-url origin >/dev/null 2>&1; then
   git add docs/ .github/ >/dev/null
   git diff --staged --quiet || git commit -q -m "digest: $DATE"
-  git push -q && echo "🚀 已推送，几分钟后生效："
-  echo "   https://<你的用户名>.github.io/<仓库名>/"
+  git push -q && echo "🚀 已推送，线上地址："
+  echo "   $(grep -E '^READER_URL=' .env 2>/dev/null | cut -d= -f2-)"
 else
   echo "还没配置 git 仓库。配置后重跑这条命令即可自动发布："
   echo "   git init && git add -A && git commit -m init"
