@@ -1,0 +1,20 @@
+.github/workflows/daily.yml
+  h_22fd74f511b019 14-15
+README.md
+  h_22fd74f511b019 7-8
+notify.py
+  h_22fd74f511b019 226-232,235,238,240
+run.sh
+  h_22fd74f511b019 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b359f349b89fe376cece232b9666e0220ddc4fde",
+  "prompts": {},
+  "humans": {
+    "h_22fd74f511b019": {
+      "author": "rex <954545647@qq.com>"
+    }
+  }
+}
