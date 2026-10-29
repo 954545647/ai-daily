@@ -1,0 +1,16 @@
+docs/2026-10-29.html
+  h_22fd74f511b019 1-187
+docs/index.html
+  h_22fd74f511b019 7,92,108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a57778400128ff7564d9ad57fc976253b2ab88a9",
+  "prompts": {},
+  "humans": {
+    "h_22fd74f511b019": {
+      "author": "rex <954545647@qq.com>"
+    }
+  }
+}
