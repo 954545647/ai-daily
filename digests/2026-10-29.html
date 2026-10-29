@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<title>AI 每天学一点 · 10月29日</title>
+<style>
+  :root{
+    --bg:#0b0d12; --card:#151922; --fg:#e8ecf4; --dim:#8b94a7;
+    --accent:#4c8dff; --line:#232936; --ok:#3ddc97;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{max-width:100%;overflow-x:hidden;word-break:break-word;overflow-wrap:anywhere}
+  body{
+    margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;
+  }
+  header{
+    position:sticky;top:0;z-index:10;background:rgba(11,13,18,.92);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+    padding:14px 18px calc(10px + env(safe-area-inset-top,0px));
+  }
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .date{font-size:13px;color:var(--dim);letter-spacing:.02em}
+  .prog{font-variant-numeric:tabular-nums;font-size:13px;color:var(--accent);font-weight:600}
+  .track{height:3px;background:var(--line);border-radius:2px;margin-top:10px;overflow:hidden}
+  .fill{height:100%;background:var(--accent);width:0;transition:width .28s ease;border-radius:2px}
+
+  main{flex:1;padding:22px 18px 0;max-width:680px;width:100%;margin:0 auto}
+  .slide{display:none;animation:in .26s ease}
+  .slide.on{display:block}
+  @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .tags{margin-bottom:10px}
+  .tag{
+    display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;
+    background:rgba(76,141,255,.12);color:#7aa9ff;margin-right:6px;
+    border:1px solid rgba(76,141,255,.22)
+  }
+  h1{font-size:23px;line-height:1.45;margin:0 0 20px;letter-spacing:-.01em}
+  .block{margin-bottom:19px}
+  .label{
+    font-size:11px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;
+    margin-bottom:5px;font-weight:600
+  }
+  .text{font-size:16px;color:#d5dbe8}
+  .text.hl{color:var(--fg);border-left:2px solid var(--accent);padding-left:13px}
+  a.src{
+    display:inline-flex;align-items:center;gap:6px;margin-top:4px;
+    font-size:14px;color:var(--accent);text-decoration:none;
+    border-bottom:1px solid rgba(76,141,255,.3);padding-bottom:1px
+  }
+  .srcname{font-size:12px;color:var(--dim);margin-left:8px}
+
+  /* 首尾页 */
+  .hero h2{font-size:13px;color:var(--dim);font-weight:600;letter-spacing:.1em;margin:0 0 12px}
+  .hero p{font-size:19px;line-height:1.7;margin:0 0 22px;color:#e8ecf4}
+  .toc{list-style:none;padding:0;margin:8px 0 0}
+  .toc li{
+    padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--dim);
+    display:flex;gap:10px
+  }
+  .toc li b{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600}
+  .task{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .task .label{color:var(--ok)}
+
+  footer{
+    position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);
+    padding:16px 18px calc(18px + env(safe-area-inset-bottom,0px));
+    max-width:680px;width:100%;margin:0 auto;display:flex;gap:10px
+  }
+  button{
+    flex:1;border:none;border-radius:13px;padding:15px;font-size:16px;font-weight:600;
+    font-family:inherit;cursor:pointer;transition:transform .12s,opacity .12s
+  }
+  button:active{transform:scale(.975)}
+  .next{background:var(--accent);color:#fff}
+  .next.done{background:var(--ok);color:#04160d}
+  .prev{flex:0 0 88px;background:var(--card);color:var(--dim);border:1px solid var(--line)}
+  .prev:disabled{opacity:.3}
+  .hint{
+    text-align:center;font-size:12px;color:var(--dim);padding:0 18px 8px;
+    max-width:680px;margin:0 auto
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="date">10月29日 周四</span>
+    <span class="prog"><span id="cur">1</span> / <span id="tot">8</span></span>
+  </div>
+  <div class="track"><div class="fill" id="fill"></div></div>
+</header>
+
+<main id="main"></main>
+
+<p class="hint">← → 键或空格切换 · 手机上左右滑动</p>
+
+<footer>
+  <button class="prev" id="prev">上一条</button>
+  <button class="next" id="next">下一条 →</button>
+</footer>
+
+<script>
+const DATA = {"intro": "Google 把 Android 开发交给第三方 Agent，GitHub 数据印证 Agent 工程爆发，但 Agent 记忆系统多数跑不过朴素 RAG。", "items": [{"title": "Google 在 Android Studio 中开放「自带 Agent」，支持 Claude、Codex 等 40+ 编码 Agent", "summary": "Google 在 Android Dev Summit 上发布 Android Studio Rabbit 2，推出「Bring Your Own Agent」功能，开发者可通过开放的 Agent Client Protocol 在 IDE 内运行超过 40 种编码 Agent，包括 Anthropic 的 Claude Agent、OpenAI 的 Codex 和 Google Antigravity。这些 Agent 可直接访问项目结构、符号解析、模拟器和 Logcat 等 IDE 工具。Google 同时发布 Android Bench 2.0 排行榜，并新增 Change Review 代码验证工具和 XML 转 Jetpack Compose 的迁移助手。", "so_what": "IDE 不再是单一 AI 助手的封闭花园，而是变成多 Agent 的运行宿主。这意味着团队可以按任务类型混用不同厂商的编码 Agent，而不是被锁定在一家模型上；同时 Agent 能直接操作模拟器和日志，调试类任务的自动化空间被打开。", "how_to_use": "如果你在用 Android Studio，升级到 Canary 预览版，在插件市场安装 Claude Agent 或 Codex，用同一个项目对比两者在符号解析和 Logcat 调试上的表现；同时用 Android Bench 2.0 的评测维度（功能、耗时、成本）记录一次真实任务的基线。", "url": "https://the-decoder.com/google-opens-android-development-to-third-party-ai-agents-and-unveils-new-gemini-apis/", "source": "The Decoder", "tags": ["开发工具", "编码 Agent", "Android"]}, {"title": "GitHub Octoverse 2026：合并 PR 数一年内翻三倍至每月 2.2 亿", "summary": "GitHub 在 Universe 大会上公布 Octoverse 2026 报告：2026 年每月合并 PR 数在不到一年内翻三倍，达到 2.2 亿；每月提交数翻三倍以上至 73.8 亿，增量主要集中在下半年；每月新建仓库数翻倍至 3030 万。报告还按行业和「互操作性/逆向工程」相关仓库做了拆分统计。", "so_what": "这是 Agent 工程（agentic engineering）对代码协作平台影响最直接的一次量化。PR 和提交的增速远超人类开发者自然增长，说明大量代码产出已经由 Agent 驱动；评审、CI 和代码质量工具的压力会同步放大，围绕「AI 生成代码的验证」的工具需求会继续上升。", "how_to_use": "拿你团队近两个季度的 PR 数量和平均评审时长做一次对比，看增速是否与平台整体趋势一致；如果 PR 数量涨了但评审人力没变，优先在 CI 里加自动化检查（如 Change Review 类工具）而不是加人。", "url": "https://simonwillison.net/2026/Oct/28/github-octoverse-2026/", "source": "Simon Willison", "tags": ["行业数据", "Agent 工程", "GitHub"]}, {"title": "论文「Memory Tax」：多数 Agent 记忆系统跑不过朴素 RAG，成本还更高", "summary": "一篇论文对多种 Agent 记忆系统做了综合评测，发现许多系统即使成本更高，表现仍不如朴素 RAG。作者提出「Memory Tax」概念来刻画这一现象。论文评论区提到，在 LongMemEval-s 上使用 Qwen3.6-27B 时，两轮 RAG 达到 81.4，高于 MemOS 的 76.6 和 HippoRAG2 的 78.2；事实追踪显示不同系统的构建损失差异很大，MemoryOS 为 98.4% 无损，而 OpenViking 有 38.0% 的采样事实没有对应记忆单元。", "so_what": "给「上记忆系统」的默认冲动泼了冷水：复杂的记忆构建管线会引入信息损失和额外成本，简单 RAG 加原始历史检索反而是强基线。做 Agent 记忆前应该先跑通朴素 RAG 基线，再论证复杂系统的净收益。", "how_to_use": "在你自己的 Agent 项目里，先用 BM25 + 一个小型 embedding 模型 + reranker 搭一个朴素 RAG 基线，记录准确率和 token 成本；任何记忆系统上线前，必须在这个基线上做 A/B，并单独统计「事实无对应记忆单元」的比例。", "url": "https://huggingface.co/papers/2610.34073", "source": "HuggingFace Papers", "tags": ["论文", "Agent 记忆", "RAG"]}, {"title": "Hallmark：面向 Claude Code、Cursor、Codex 的「反 AI 味」设计技能", "summary": "Hallmark 是 Together AI 制作的一个设计技能，适用于 Claude Code、Codex、Cursor 和 OpenCode，目标是让生成的页面不像 AI 产出。它从 50 个主题中抽取三个，围绕访客目的构建页面，并在真实浏览器中针对机器生成痕迹做 lint，例如每个标题上方的 eyebrow、字距大写标签、标题里一个彩色词、空框架页面、每页末尾的邮件订阅表单等。v2 新增 50 个主题、按任务类型构建页面、自定义页面、指向 URL 或开发服务器自动截图、755 张开放授权照片，以及 redesign 和 audit 两个命令。", "so_what": "AI 生成前端页面的同质化已经被明确识别为可 lint 的问题。把「不像 AI 做的」变成一组可检查的规则和分级门禁（Floor 永不发布、Reflex 可带理由覆盖、Finish 不阻塞），这比笼统要求「设计好看点」更可执行。", "how_to_use": "在 Claude Code 或 Cursor 里安装 Hallmark 技能，对你现有的落地页跑一次 /hallmark audit <path>，只出报告不改代码；根据报告里命中的 Reflex 规则，挑一条（比如去掉每个标题上方的 eyebrow）手动改掉，再跑一次对比。", "url": "https://github.com/Nutlope/hallmark", "source": "GitHub Trending", "tags": ["开源项目", "编码 Agent", "前端设计"]}, {"title": "OpenBot：本地优先的桌面工作区，让 Codex、Claude、Grok 作为常驻 AI 队友协作", "summary": "OpenBot 是 nightly-labs 开源的本地优先桌面工作区，用于运行常驻 AI 队友。它支持 Codex、Claude 和 Grok，提供独立工作区、任务队列、文件共享、浏览器控制和 Agent 间协作。仓库包含 skills、marketplace、docker、nix 等目录，提交历史显示 2304 次提交。", "so_what": "多 Agent 协作正从「在 IDE 里切换」走向「在独立工作区里常驻并互相派活」。本地优先意味着代码和文件不必上传到第三方编排服务，对数据敏感团队是一个可评估的替代方案。", "how_to_use": "克隆仓库后先用 docker 方式启动，给两个 Agent 各建一个工作区，让其中一个把任务写进任务队列、另一个从队列取任务并共享一个文件目录，观察 Agent 间协作的实际开销和失败点。", "url": "https://github.com/nightly-labs/openbot", "source": "GitHub Trending", "tags": ["开源项目", "多 Agent", "本地优先"]}, {"title": "Google 发布 Gemini 4 Carbon 相关页面", "summary": "Google 博客发布了一篇题为「Introducing Gemini 4 Carbon」的文章。抓取到的正文主要是页面样式和动画代码，未包含模型能力、版本参数或发布细节等实质内容。", "so_what": "标题表明 Google 在 Gemini 模型线上有新动作，但原文抓取未提供可核实的具体信息，暂不宜据此做技术判断。", "how_to_use": "打开原文链接，确认是否包含模型名称、上下文长度、定价和可用渠道；在信息明确前，不要基于该标题修改任何选型或迁移计划。", "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/", "source": "Hacker News", "tags": ["模型发布"]}], "action": "打开 Hallmark 仓库，按 README 在你的 Claude Code 或 Cursor 里安装该技能，然后对一个现有页面运行 /hallmark audit <path>，只读报告不改代码，记录命中的前三条「AI 味」规则。", "watch": "Agent 记忆系统的净收益：Memory Tax 论文给出的朴素 RAG 强基线，会迫使后续记忆系统在论文和产品里都公开对比成本和事实覆盖率，而不是只报准确率。", "sources_note": "信息来自 Hacker News、The Decoder、GitHub Trending、HuggingFace Papers 和 Simon Willison 博客共 6 条原文抓取内容。", "date": "2026-10-29", "grounded": true};
+const STORE = 'aidaily-pos-' + DATA.date;
+let i = 0;
+
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function slides(){
+  const out = [];
+  // 封面
+  out.push(`<section class="slide hero" id="s0">
+    <h2>今天的主线</h2>
+    <p>${esc(DATA.intro)}</p>
+    <h2>共 ${DATA.items.length} 条</h2>
+    <ul class="toc">${DATA.items.map((it,n)=>
+      `<li><b>${String(n+1).padStart(2,'0')}</b><span>${esc(it.title)}</span></li>`).join('')}</ul>
+  </section>`);
+  // 每一条
+  DATA.items.forEach((it, n) => {
+    out.push(`<section class="slide" id="s${n+1}">
+      <div class="tags">${(it.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <h1>${esc(it.title)}</h1>
+      <div class="block"><div class="label">讲了什么</div><div class="text">${esc(it.summary)}</div></div>
+      ${it.so_what ? `<div class="block"><div class="label">为什么值得看</div><div class="text hl">${esc(it.so_what)}</div></div>` : ''}
+      ${it.how_to_use ? `<div class="block"><div class="label">可以怎么用</div><div class="text">${esc(it.how_to_use)}</div></div>` : ''}
+      <div class="block"><a class="src" href="${esc(it.url)}" target="_blank" rel="noopener">读原文 →</a>
+        <span class="srcname">${esc(it.source||'')}</span></div>
+    </section>`);
+  });
+  // 收尾
+  out.push(`<section class="slide hero" id="s${DATA.items.length+1}">
+    <h2>今天花 10 分钟</h2>
+    <div class="task"><div class="label">动手</div><div class="text">${esc(DATA.action||'')}</div></div>
+    ${DATA.watch ? `<div class="task"><div class="label" style="color:#7aa9ff">值得盯的一条线</div><div class="text">${esc(DATA.watch)}</div></div>` : ''}
+    <p style="font-size:14px;color:#8b94a7;margin-top:18px">${esc(DATA.sources_note||'')}</p>
+  </section>`);
+  return out;
+}
+
+const SLIDES = slides();
+document.getElementById('main').innerHTML = SLIDES.join('');
+document.getElementById('tot').textContent = SLIDES.length;
+
+function render(){
+  document.querySelectorAll('.slide').forEach((s,n)=>s.classList.toggle('on', n===i));
+  document.getElementById('cur').textContent = i+1;
+  document.getElementById('fill').style.width = ((i+1)/SLIDES.length*100) + '%';
+  document.getElementById('prev').disabled = i===0;
+  const nx = document.getElementById('next');
+  nx.textContent = i === SLIDES.length-1 ? '✓ 今天学完了' : (i===0 ? '开始 →' : '下一条 →');
+  nx.classList.toggle('done', i === SLIDES.length-1);
+  window.scrollTo({top:0, behavior:'smooth'});
+  try{localStorage.setItem(STORE, i)}catch(e){}
+  try{history.replaceState(null,'','#s'+i)}catch(e){}
+}
+
+function go(n){
+  if(n<0||n>=SLIDES.length) return;
+  i=n; render();
+}
+document.getElementById('next').onclick = ()=> i===SLIDES.length-1 ? render() : go(i+1);
+document.getElementById('prev').onclick = ()=> go(i-1);
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight'||e.key===' ') {e.preventDefault(); go(i+1);}
+  if(e.key==='ArrowLeft'){e.preventDefault(); go(i-1);}
+});
+
+let sx=0, sy=0;
+document.addEventListener('touchstart', e=>{sx=e.touches[0].clientX; sy=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend', e=>{
+  const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.6){ dx<0 ? go(i+1) : go(i-1); }
+},{passive:true});
+
+const m = location.hash.match(/^#s([0-9]+)$/);
+if(m){ const h = +m[1]; if(h>=0 && h<SLIDES.length) i = h; }
+else { try{ const saved = +localStorage.getItem(STORE); if(!isNaN(saved) && saved>0 && saved<SLIDES.length) i = saved; }catch(e0){} }
+render();
+</script>
+</body>
+</html>

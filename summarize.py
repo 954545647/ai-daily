@@ -55,7 +55,9 @@ WRITE_RULES = """写作要求：
 - so_what：给判断，说明这件事改变了什么认知或做法
 - how_to_use：具体到能立刻执行的动作，不要写「多关注」这种空话
 - **原文没提到的信息一律不写**，宁可少写，不许猜测补全
-- 特别禁止：编造模型名称/版本号/价格/日期/人名，除非原文里逐字出现"""
+- 特别禁止：编造模型名称/版本号/价格/日期/人名，除非原文里逐字出现
+- **如果某条抓到的原文没有实质内容**（只有页面代码、只有标题、或明显是抓取失败），
+  就不要写这一条，直接少写一条。宁可 5 条都扎实，也不要 6 条里有凑数的"""
 
 
 # ---------------------------------------------------------------- 模型调用
@@ -127,11 +129,18 @@ def extract_json(text: str) -> dict:
 
 def fetch_page_text(url: str, limit: int = 3000) -> str:
     """抓原文正文，失败返回空串（不抛异常）。"""
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=20) as r:
-            raw = r.read(400_000).decode("utf-8", "ignore")
-    except Exception:
+    raw = ""
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                raw = r.read(400_000).decode("utf-8", "ignore")
+            if raw:
+                break
+        except Exception:
+            if attempt < 2:
+                time.sleep(1.5 * (attempt + 1))
+    if not raw:
         return ""
     raw = re.sub(r"<(script|style|nav|footer|header|svg)[^>]*>.*?</\1>", " ",
                  raw, flags=re.S | re.I)
@@ -143,6 +152,18 @@ def fetch_page_text(url: str, limit: int = 3000) -> str:
         if 0 < i < 600:
             txt = txt[i + len(anchor):]
             break
+
+    # JS 渲染的页面常常抓回来一堆 CSS/动画代码，这类内容当"没抓到"处理
+    # 判据：每千字的句子数。真文章 5-9，CSS/JS 噪声接近 0
+    prose = txt.count(". ") + txt.count("。") + txt.count("? ") + txt.count("! ")
+    if len(txt) > 300 and prose / (len(txt) / 1000) < 2.0:
+        return ""
+    if txt.count("{") > 15:
+        txt = re.sub(r"\{[^{}]{0,600}\}", " ", txt)
+        txt = re.sub(r"\s+", " ", txt).strip()
+    letters = sum(1 for ch in txt if ch.isalpha() or "\u4e00" <= ch <= "\u9fff")
+    if len(txt) > 200 and letters / len(txt) < 0.45:
+        return ""
     return txt[:limit]
 
 
@@ -200,7 +221,7 @@ def write_messages(pages: list[dict], count: int) -> list[dict]:
         body = p["text"] or p["fallback"]
         blocks.append(
             f"### 第 {i} 条（来源:{p['source']}，链接:{p['url']}）\n"
-            f"抓到的原文（可能含页面杂讯，只取与主题相关的部分）：\n{body}\n")
+            f"抓到的原文（可能含页面杂讯；如果下面是空的或只有代码，说明没抓到，这条就别写）：\n{body or '(没抓到正文)'}\n")
 
     user = f"""下面是从原文抓到的内容，共 {len(blocks)} 条。
 
