@@ -1,0 +1,16 @@
+digests/2026-10-29.html
+  h_22fd74f511b019 1-187
+summarize.py
+  h_22fd74f511b019 58-60,132-143,155-166,224
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6bc6def839528511bc66ba90d9032d8b59cd423f",
+  "prompts": {},
+  "humans": {
+    "h_22fd74f511b019": {
+      "author": "rex <954545647@qq.com>"
+    }
+  }
+}
